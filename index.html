@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Form Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        form {
+            margin: 20px 0;
+        }
+        label {
+            margin-right: 10px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate a Mail Form</h1>
+
+    <!-- Step 1: Checkbox Selection -->
+    <form id="fieldSelectionForm">
+        <h2>Select the fields to include:</h2>
+        <label><input type="checkbox" value="Name"> Name</label><br>
+        <label><input type="checkbox" value="Email"> Email</label><br>
+        <label><input type="checkbox" value="Phone"> Phone</label><br>
+        <label><input type="checkbox" value="Message"> Message</label><br>
+        <button type="button" onclick="generateForm()">Generate Form</button>
+    </form>
+
+    <!-- Step 2: Generated Form -->
+    <div id="generatedFormContainer" style="display:none;">
+        <h2>Your Custom Mail Form</h2>
+        <form id="emailForm">
+            <!-- Dynamic fields will be inserted here -->
+        </form>
+        <button type="button" onclick="sendEmail()">Send Email</button>
+    </div>
+
+    <script>
+        // Function to generate the email form based on selected checkboxes
+        function generateForm() {
+            const selectedFields = Array.from(document.querySelectorAll('#fieldSelectionForm input:checked'));
+            const formContainer = document.getElementById('generatedFormContainer');
+            const emailForm = document.getElementById('emailForm');
+
+            // Clear existing form fields
+            emailForm.innerHTML = '';
+
+            // If no fields are selected, show an alert
+            if (selectedFields.length === 0) {
+                alert('Please select at least one field.');
+                return;
+            }
+
+            // Create form fields dynamically
+            selectedFields.forEach(field => {
+                const fieldName = field.value.toLowerCase();
+                const fieldLabel = document.createElement('label');
+                fieldLabel.innerHTML = `${field.value}: `;
+                const fieldInput = fieldName === 'message' 
+                    ? document.createElement('textarea') 
+                    : document.createElement('input');
+                fieldInput.name = fieldName;
+                fieldInput.required = true;
+                fieldInput.style.display = 'block';
+                emailForm.appendChild(fieldLabel);
+                emailForm.appendChild(fieldInput);
+            });
+
+            // Show the form container
+            formContainer.style.display = 'block';
+        }
+
+        // Function to send the email using the mailto: scheme
+        function sendEmail() {
+            const emailForm = document.getElementById('emailForm');
+            const formData = new FormData(emailForm);
+            let mailtoBody = "";
+
+            // Construct the mail body
+            formData.forEach((value, key) => {
+                mailtoBody += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}\n`;
+            });
+
+            // Encode the body and subject
+            const encodedBody = encodeURIComponent(mailtoBody);
+            const subject = encodeURIComponent("Custom Form Submission");
+
+            // Trigger mailto link
+            window.location.href = `mailto:sebastian@familie-luebke.com?subject=${subject}&body=${encodedBody}`;
+        }
+    </script>
+</body>
+</html>
+
